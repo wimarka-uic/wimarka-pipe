@@ -1,17 +1,18 @@
 """
-Error Detection Component using Gemma 3
+Error Detection Component using DistilBERT
 """
 
 import logging
 from typing import List, Dict, Any, Optional
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch.nn as nn
+from transformers import DistilBertTokenizer, DistilBertModel
 
 from ..config import ModelConfig
 
 
 class ErrorDetector:
-    """Error detection component using Gemma 3"""
+    """Error detection component using DistilBERT"""
     
     def __init__(self, config: ModelConfig):
         """Initialize error detector with configuration"""
@@ -20,16 +21,14 @@ class ErrorDetector:
         
         try:
             # Load tokenizer and model
-            self.tokenizer = AutoTokenizer.from_pretrained(
+            self.tokenizer = DistilBertTokenizer.from_pretrained(
                 config.model_name,
                 cache_dir="./cache"
             )
             
-            self.model = AutoModelForCausalLM.from_pretrained(
+            self.model = DistilBertModel.from_pretrained(
                 config.model_name,
-                cache_dir="./cache",
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                device_map="auto" if torch.cuda.is_available() else None
+                cache_dir="./cache"
             )
             
             # Set device
@@ -38,14 +37,31 @@ class ErrorDetector:
             else:
                 self.device = config.device
             
-            if not torch.cuda.is_available():
-                self.model.to(self.device)
+            self.model.to(self.device)
+            
+            # Initialize error detection head
+            self.error_detection_head = self._create_error_detection_head()
             
             self.logger.info(f"Error detection model loaded: {config.model_name} on {self.device}")
             
         except Exception as e:
             self.logger.error(f"Failed to load error detection model: {str(e)}")
             raise
+    
+    def _create_error_detection_head(self) -> nn.Module:
+        """Create the error detection head"""
+        hidden_size = self.model.config.hidden_size
+        
+        error_detection_head = nn.Sequential(
+            nn.Linear(hidden_size, hidden_size // 2),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(hidden_size // 2, 3),  # 3 error types: grammar, spelling, semantic
+            nn.Sigmoid()
+        )
+        
+        error_detection_head.to(self.device)
+        return error_detection_head
     
     def detect_errors(self, text: str, tokens: List[str]) -> List[Dict[str, Any]]:
         """

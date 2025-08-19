@@ -9,14 +9,14 @@ The pipeline follows a modular architecture with the following flow:
 ```
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │   INPUT     │───▶│  TOKENIZER   │───▶│ EMBEDDINGS   │───▶│TRANSFORMER   │
-│   TEXT      │    │ (BERT-based) │    │(Sentence     │    │(Gemma 3)     │
+│   TEXT      │    │ (BERT-based) │    │(Sentence     │    │(DistilBERT)  │
 └─────────────┘    └──────────────┘    │Transformers) │    │Error Detection│
                                        └──────────────┘    └──────────────┘
                                                                     │
                                                                     ▼
 ┌─────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │   OUTPUT    │◀───│  CORRECTION  │◀───│ EXPLANATION  │◀───│MULTI-LABEL   │
-│ CORRECTED   │    │(DistilBERT   │    │(Tiny T5)     │    │REGRESSION    │
+│ CORRECTED   │    │(DistilBERT   │    │(Gemma 3)     │    │REGRESSION    │
 │   TEXT      │    │Attention)    │    │Explanation   │    │(Scoring)     │
 └─────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
 ```
@@ -37,11 +37,11 @@ The pipeline follows a modular architecture with the following flow:
 - Generates high-dimensional vector representations
 - Supports batch processing for efficiency
 
-### 4. **Error Detection (Gemma 3)**
-- Advanced error detection using Google's Gemma 3 model
+### 4. **Error Detection (DistilBERT)**
+- Advanced error detection using DistilBERT model
 - Identifies grammatical, spelling, and semantic errors
 - Provides confidence scores and suggestions
-- JSON-structured error output with positions
+- Classification-based error detection with attention mechanism
 
 ### 5. **Multi-Label Regression Scoring**
 - DistilBERT-based scoring across multiple dimensions:
@@ -53,11 +53,11 @@ The pipeline follows a modular architecture with the following flow:
   - Overall Quality
 - Error-aware score adjustment
 
-### 6. **Explanation Generation (Tiny T5)**
-- Text-to-text explanations using Tiny T5
+### 6. **Explanation Generation (Gemma 3)**
+- Advanced explanation generation using Google's Gemma 3 model
 - Generates human-readable explanations for errors
 - Provides improvement suggestions
-- Context-aware explanations
+- Context-aware explanations with high-quality text generation
 
 ### 7. **Correction Generation (DistilBERT Attention)**
 - Attention-based correction using DistilBERT
@@ -178,20 +178,20 @@ config = PipelineConfig(
 - **Features**: Semantic embeddings, batch processing
 - **Output**: High-dimensional vectors
 
-### Error Detector (Gemma 3)
-- **Model**: Google Gemma 3 (2B parameters)
-- **Features**: Multi-type error detection
-- **Output**: Structured error information with positions
+### Error Detector (DistilBERT)
+- **Model**: DistilBERT with custom error detection head
+- **Features**: Classification-based error detection
+- **Output**: Error classifications with confidence scores
 
 ### Multi-Label Scorer
 - **Model**: DistilBERT with custom scoring head
 - **Features**: 6-dimensional quality scoring
 - **Output**: Normalized scores (0-1) for each dimension
 
-### Explanation Generator (Tiny T5)
-- **Model**: Google T5-small
-- **Features**: Text-to-text explanation generation
-- **Output**: Human-readable explanations and suggestions
+### Explanation Generator (Gemma 3)
+- **Model**: Google Gemma 3 (2B parameters)
+- **Features**: Advanced text generation for explanations
+- **Output**: High-quality human-readable explanations and suggestions
 
 ### Correction Generator (DistilBERT Attention)
 - **Model**: DistilBERT with attention mechanism
@@ -201,10 +201,10 @@ config = PipelineConfig(
 
 ## 🙏 Acknowledgments
 
-- **Google**: Gemma 3 and T5 models
-- **Hugging Face**: Transformers library
+- **Google**: Gemma 3 model
+- **Hugging Face**: Transformers library and DistilBERT
 - **Sentence Transformers**: Embedding models
-- **DistilBERT**: Efficient BERT variant
+- **DistilBERT**: Efficient BERT variant for error detection
 
 ---
 

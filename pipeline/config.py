@@ -33,7 +33,7 @@ class PipelineConfig:
     )
     
     error_detection_config: ModelConfig = ModelConfig(
-        model_name="google/gemma-3-2b",
+        model_name="distilbert-base-uncased",
         max_length=512
     )
     
@@ -43,8 +43,8 @@ class PipelineConfig:
     )
     
     explanation_config: ModelConfig = ModelConfig(
-        model_name="google/t5-small",
-        max_length=256
+        model_name="google/gemma-3-2b",
+        max_length=512
     )
     
     correction_config: ModelConfig = ModelConfig(
