@@ -3,7 +3,7 @@ Pipeline Configuration
 """
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 from pathlib import Path
 
@@ -14,7 +14,7 @@ class ModelConfig:
     model_name: str
     max_length: int = 512
     batch_size: int = 8
-    device: str = "auto"  # auto, cpu, cuda
+    device: str = "cpu"  # auto, cpu, cuda
 
 
 @dataclass
@@ -22,35 +22,35 @@ class PipelineConfig:
     """Main pipeline configuration"""
     
     # Model configurations
-    tokenizer_config: ModelConfig = ModelConfig(
+    tokenizer_config: ModelConfig = field(default_factory=lambda: ModelConfig(
         model_name="bert-base-uncased",
         max_length=512
-    )
+    ))
     
-    embedding_config: ModelConfig = ModelConfig(
+    embedding_config: ModelConfig = field(default_factory=lambda: ModelConfig(
         model_name="sentence-transformers/all-MiniLM-L6-v2",
         max_length=512
-    )
+    ))
     
-    error_detection_config: ModelConfig = ModelConfig(
+    error_detection_config: ModelConfig = field(default_factory=lambda: ModelConfig(
         model_name="distilbert-base-uncased",
         max_length=512
-    )
+    ))
     
-    scoring_config: ModelConfig = ModelConfig(
+    scoring_config: ModelConfig = field(default_factory=lambda: ModelConfig(
         model_name="distilbert-base-uncased",
         max_length=512
-    )
+    ))
     
-    explanation_config: ModelConfig = ModelConfig(
-        model_name="google/gemma-3-2b",
+    explanation_config: ModelConfig = field(default_factory=lambda: ModelConfig(
+        model_name="t5-small",
         max_length=512
-    )
+    ))
     
-    correction_config: ModelConfig = ModelConfig(
+    correction_config: ModelConfig = field(default_factory=lambda: ModelConfig(
         model_name="distilbert-base-uncased",
         max_length=512
-    )
+    ))
     
     # Pipeline settings
     cache_dir: str = "./cache"
